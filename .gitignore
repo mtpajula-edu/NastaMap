@@ -8,6 +8,8 @@
 /captures
 .externalNativeBuild
 
+app/src/debug/res/values/google_maps_api.xml
+
 # Built application files
 *.apk
 *.ap_
@@ -71,3 +73,4 @@ fastlane/Preview.html
 fastlane/screenshots
 fastlane/test_output
 fastlane/readme.md
+app/src/debug/res/values/google_maps_api.xml
