@@ -27,7 +27,7 @@ import java.util.Map;
  */
 
 
-public class AbstractVolleyActivity extends FragmentActivity {
+public class AbstractVolleyActivity extends AppCompatActivity {
 
     public RequestQueue requestQueue;
     public Gson gson;
