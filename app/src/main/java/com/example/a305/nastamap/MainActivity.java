@@ -3,6 +3,9 @@ package com.example.a305.nastamap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -22,10 +25,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener, OnMapReadyCallback {
+        implements NavigationView.OnNavigationItemSelectedListener {
 
-    private UiSettings mUiSettings;
-    private GoogleMap map;
+    private Integer currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,8 +54,8 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
+        //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        //mapFragment.getMapAsync(this);
     }
 
     @Override
@@ -94,6 +96,7 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
+        /*
         if (id == R.id.nav_map) {
 
         } else if (id == R.id.nav_filter) {
@@ -102,25 +105,43 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_history) {
 
-        }
+        }*/
+        startFragment(id);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        map = googleMap;
+    public void startFragment(Integer id) {
+        currentFragment = id;
+        Log.d("FRAGMENT"," ... startFragment ...");
 
-        mUiSettings = map.getUiSettings();
-        mUiSettings.setZoomControlsEnabled(true);
+        Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if(fragment != null) {
+            Log.d("Fragment","fragment not null");
+            getSupportFragmentManager().beginTransaction().remove(fragment).commit();
+        }
 
-        // Add a marker in Sydney and move the camera
-        LatLng point = new LatLng(66.5, 25.7);
-        map.addMarker(new MarkerOptions().position(point).title("hello world"));
+        //manager = this.getSupportFragmentManager();
+        // Begin the transaction
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        // Replace the contents of the container with the new fragment
 
-        map.moveCamera(CameraUpdateFactory.zoomTo(10));
-        map.moveCamera(CameraUpdateFactory.newLatLng(point));
+
+        // TODO replace else if -system with switch statment
+
+        if (id == null) {
+
+        } else if (id == R.id.nav_map) {
+            ft.replace(R.id.fragment_container, new MapFragment());
+        } else if (id == R.id.nav_history) {
+            ft.replace(R.id.fragment_container, new HistoryFragment());
+        } else {
+            return;
+        }
+
+        // Complete the changes added above
+        ft.commit();
     }
 }
