@@ -16,6 +16,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.a305.nastamap.apifeed.Feed;
+import com.example.a305.nastamap.apifeed.HalJson;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -24,10 +26,11 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MainActivity extends AppCompatActivity
+public class MainActivity extends AbstractVolleyActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Integer currentFragment;
+    private HalJson hal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,15 +38,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -56,6 +50,7 @@ public class MainActivity extends AppCompatActivity
 
         //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         //mapFragment.getMapAsync(this);
+        fetchPostsFromFile();
     }
 
     @Override
@@ -129,19 +124,32 @@ public class MainActivity extends AppCompatActivity
         // Replace the contents of the container with the new fragment
 
 
-        // TODO replace else if -system with switch statment
-
         if (id == null) {
 
         } else if (id == R.id.nav_map) {
-            ft.replace(R.id.fragment_container, new MapFragment());
+            MapFragment mapfragment = new MapFragment();
+            ft.replace(R.id.fragment_container, mapfragment);
+            mapfragment.setHalJson(hal);
         } else if (id == R.id.nav_history) {
-            ft.replace(R.id.fragment_container, new HistoryFragment());
+            HistoryFragment hfragment = new HistoryFragment();
+            ft.replace(R.id.fragment_container, hfragment);
+            hfragment.setHalJson(hal);
+        } else if (id == R.id.nav_real) {
+            ft.replace(R.id.fragment_container, new RealTimeFragment());
         } else {
             return;
         }
 
         // Complete the changes added above
         ft.commit();
+    }
+
+    private void fetchPostsFromFile() {
+
+        String response = readRawTextFile(getApplicationContext(), R.raw.data);
+        Log.d("Response", response);
+        hal = gson.fromJson(response, HalJson.class);
+
+        Log.d("feeds from api: ", String.valueOf(hal.getEmbedded().getFeed().size()));
     }
 }

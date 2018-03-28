@@ -1,5 +1,6 @@
 package com.example.a305.nastamap;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -14,12 +15,18 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.a305.nastamap.apifeed.Feed;
+import com.example.a305.nastamap.apifeed.HalJson;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,13 +49,40 @@ public class AbstractVolleyActivity extends AppCompatActivity {
         //setContentView(R.layout.activity_main);
 
         requestQueue = Volley.newRequestQueue(this);
-        GsonBuilder gsonBuilder = new GsonBuilder();
-        gson = gsonBuilder.create();
+
+        //GsonBuilder gsonBuilder = new GsonBuilder();
+        //gson = gsonBuilder.create();
+
+        gson = new GsonBuilder()
+                .registerTypeAdapter(Feed.class, new Feed.FeedDeserilizer())
+                .create();
 
         headers = new HashMap<String, String>();
         headers.put("Accept", "application/json");
         headers.put("Content-Type", "application/json; charset=utf-8");
     }
+
+    public static String readRawTextFile(Context ctx, int resId)
+    {
+        InputStream inputStream = ctx.getResources().openRawResource(resId);
+
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        int i;
+        try {
+            i = inputStream.read();
+            while (i != -1)
+            {
+                byteArrayOutputStream.write(i);
+                i = inputStream.read();
+            }
+            inputStream.close();
+        } catch (Exception e) {
+            return null;
+        }
+        return byteArrayOutputStream.toString();
+    }
+
 
     public void setProgressBar(int pb) {
         progressBar = (ProgressBar) findViewById(pb);
