@@ -6,37 +6,37 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_map"
-            android:icon="@drawable/ic_menu_camera"
+            android:icon="@drawable/ic_map_black"
             android:title="Map" />
-        <item
-            android:id="@+id/nav_filter"
-            android:icon="@drawable/ic_menu_manage"
-            android:title="Filter" />
     </group>
 
     <item android:title="Feed">
         <menu>
             <item
                 android:id="@+id/nav_real"
-                android:icon="@drawable/ic_menu_camera"
+                android:icon="@drawable/ic_rss_feed_black"
                 android:title="Real time" />
             <item
                 android:id="@+id/nav_history"
-                android:icon="@drawable/ic_menu_camera"
-                android:title="History" />
+                android:icon="@drawable/ic_list_black"
+                android:title="Current list" />
         </menu>
     </item>
 
-    <item android:title="Salect history">
+    <item android:title="Data page">
     <menu>
         <item
             android:id="@+id/nav_prev"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Older data" />
+            android:icon="@drawable/ic_keyboard_arrow_left_black"
+            android:title="Previous" />
         <item
             android:id="@+id/nav_next"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="Newer data" />
+            android:icon="@drawable/ic_keyboard_arrow_right_black"
+            android:title="Next" />
+        <item
+            android:id="@+id/nav_last"
+            android:icon="@drawable/ic_last_page_black"
+            android:title="Last" />
     </menu>
 </item>
 

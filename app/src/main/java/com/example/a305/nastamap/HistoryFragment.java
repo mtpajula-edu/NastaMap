@@ -1,12 +1,18 @@
 package com.example.a305.nastamap;
 
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.app.FragmentManager;
+//import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.a305.nastamap.apifeed.Feed;
 import com.example.a305.nastamap.apifeed.HalJson;
@@ -47,6 +53,21 @@ public class HistoryFragment extends Fragment {
             adapter.notifyDataSetChanged();
         }
 
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> adapter, View v, int position,
+                                    long arg3)
+            {
+                Feed feed = (Feed) adapter.getItemAtPosition(position);
+                //Toast.makeText(getActivity(),feed.getSensor(), Toast.LENGTH_LONG).show();
+
+                if (feed.getSensor().contains("camera")) {
+                    openWebFragment(feed.getPayload());
+                }
+            }
+        });
+
         return rootView;
     }
 
@@ -54,4 +75,19 @@ public class HistoryFragment extends Fragment {
         this.hal = hal;
         Log.d("FRAGMENT","setHalJson");
     }
+
+    public void openWebFragment(String path) {
+        WebFragment wf = new WebFragment();
+
+        String url = "http://" + ((MainActivity)getActivity()).getIp() + path;
+        wf.setUrl(url);
+
+
+        FragmentTransaction ft = ((MainActivity)getActivity()).getSupportFragmentManager().beginTransaction();
+        //FragmentTransaction ft = fragmentManager.beginTransaction();
+        ft.replace(R.id.fragment_container,wf);
+        ft.addToBackStack(null);
+        ft.commit();
+    }
+
 }

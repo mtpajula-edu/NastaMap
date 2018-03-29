@@ -12,6 +12,7 @@ import android.widget.ListView;
 import com.example.a305.nastamap.apifeed.Feed;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.DisconnectedBufferOptions;
@@ -25,21 +26,33 @@ import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class RealTimeFragment extends Fragment {
 
     public MqttAndroidClient mqttAndroidClient;
-    public final String serverUri = "tcp://ylowmv.messaging.internetofthings.ibmcloud.com:1883";
-    public String clientId = "a:ylowmv:a1700992";
-    public final String subscriptionTopic = "iot-2/type/DVPRO2/id/2/evt/data/fmt/json";
-    public static final String mqttUsername = "a-ylowmv-i8imsv2yzv";
-    public static final String mqttPassword = "o+bN)oAa&K9DJi&wK1";
+    public String serverUri;
+    public String clientId = "a:ylowmv:";
+    public String subscriptionTopic;
+    public String mqttUsername;
+    public String mqttPassword;
     public ListView mListView;
     public Gson gson;
     //public ArrayList<String> posts = new ArrayList<String>();
     //public ArrayAdapter<String> adapter;
     public FeedListAdapter adapter;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        serverUri         = getResources().getString(R.string.mqtt_server_url);
+        //clientId          = getResources().getString(R.string.mqtt_client_id);
+        subscriptionTopic = getResources().getString(R.string.mqtt_topic);
+        mqttUsername      = getResources().getString(R.string.mqtt_username);
+        mqttPassword      = getResources().getString(R.string.mqtt_password);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -49,10 +62,16 @@ public class RealTimeFragment extends Fragment {
 
         Log.d("FRAGMENT","onCreateView RealTimeFragment");
 
+        //clientId += String.valueOf(System.currentTimeMillis() / 1000L);
+        Log.d("MQTT clientId",clientId);
+
         getActivity().setTitle("Real time feed");
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gson = gsonBuilder.create();
+        //gson = new GsonBuilder()
+        //        .registerTypeAdapter(Feed.class, new Feed.FeedDeserilizer())
+        //        .create();
 
         // ListView
         //adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, posts);
@@ -109,6 +128,7 @@ public class RealTimeFragment extends Fragment {
 
         try {
             addToHistory("Connecting to " + serverUri);
+            Log.d("MQTT","password: " + mqttPassword);
 
             mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
                 @Override
@@ -136,11 +156,27 @@ public class RealTimeFragment extends Fragment {
         return rootView;
     }
 
+    public void addToClientId(String add) {
+        clientId = "a:ylowmv:" + add;
+    }
+
     private void addToHistory(String mainText){
         Log.d("addToHistory", mainText);
 
         Feed feed = new Feed();
         feed.setPayload(mainText);
+        feed.setSensor("");
+
+        try {
+            feed = gson.fromJson(mainText, Feed.class);
+        } catch (JsonSyntaxException e) {
+            Log.d("addToHistory", "Not feed object");
+        }
+
+        if (feed.getSensor().contains("ip")) {
+            ((MainActivity)getActivity()).setIp(feed.getPayload());
+            return;
+        }
 
         adapter.listData.add(0, feed);
         // next thing you have to do is check if your adapter has changed

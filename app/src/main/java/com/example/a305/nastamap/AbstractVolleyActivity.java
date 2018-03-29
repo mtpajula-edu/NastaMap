@@ -42,6 +42,9 @@ public class AbstractVolleyActivity extends AppCompatActivity {
     //public Feedback f = new Feedback();
     //public ArrayList<Feedback> feeds = new ArrayList<Feedback>();
     public ProgressBar progressBar;
+    public String ip = "";
+    public HalJson hal;
+    public boolean isInit = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +53,12 @@ public class AbstractVolleyActivity extends AppCompatActivity {
 
         requestQueue = Volley.newRequestQueue(this);
 
-        //GsonBuilder gsonBuilder = new GsonBuilder();
-        //gson = gsonBuilder.create();
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gson = gsonBuilder.create();
 
-        gson = new GsonBuilder()
-                .registerTypeAdapter(Feed.class, new Feed.FeedDeserilizer())
-                .create();
+        //gson = new GsonBuilder()
+        //        .registerTypeAdapter(Feed.class, new Feed.FeedDeserilizer())
+        //        .create();
 
         headers = new HashMap<String, String>();
         headers.put("Accept", "application/json");
@@ -89,20 +92,60 @@ public class AbstractVolleyActivity extends AppCompatActivity {
         progressBar.setVisibility(View.INVISIBLE);
     }
 
-    public void fetchFeedback() {
-        //feeds.clear();
-        addRequest(Request.Method.GET, null, onLoaded, false);
+    public void fetchInit() {
+        isInit = true;
+        String url = "http://" + ip + "/apigility/public/index.php/feed";
+        addRequest(Request.Method.GET, url, null, onLoaded, false);
     }
 
-    public void addRequest(int method, String id, Response.Listener<String> go, boolean body) {
+    public boolean fetchNext() {
+        isInit = false;
+        if (hal.getLinks().getNext() != null) {
+            addRequest(Request.Method.GET, hal.getLinks().getNext().getHref(), null, onLoaded, false);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean fetchPrev() {
+        isInit = false;
+        if (hal.getLinks().getPrev() != null) {
+            addRequest(Request.Method.GET, hal.getLinks().getPrev().getHref(), null, onLoaded, false);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean fetchLast() {
+        isInit = false;
+        if (hal.getLinks().getLast() != null) {
+            addRequest(Request.Method.GET, hal.getLinks().getLast().getHref(), null, onLoaded, false);
+            return true;
+        }
+        return false;
+    }
+
+    public void setIp(String ip) {
+        if (!ip.equals(this.ip)) {
+            Log.d("IP",ip);
+            this.ip = ip;
+            fetchInit();
+        }
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void addRequest(int method, String url, String id, Response.Listener<String> go, boolean body) {
 
         progressBar.setVisibility(View.VISIBLE);
 
-        String url = "http://10.0.2.2/apigility/public/feedback";
+        //String url = "http://" + ip + "/apigility/public/index.php/feed";
         if (id != null) {
             url += "/" + id;
         }
-        Log.i("addRequest", url);
+        Log.i("REQUEST", url);
 
         if (body) {
             StringRequest request = new StringRequest(method, url, go, onError) {
@@ -138,46 +181,38 @@ public class AbstractVolleyActivity extends AppCompatActivity {
         }
     }
 
-    /*
-    public void removeFeedback(String id) {
-        addRequest(Request.Method.DELETE, id, onPosted, false);
-    }
-
-    public void setFeedback() {
-        addRequest(Request.Method.POST, null, onPosted, true);
-    }
-
-    public void patchFeedback() {
-        //String id2 = f.getId();
-        //f.setId(null);
-        //addRequest(Request.Method.PATCH, id2, onPosted, true);
-    }
-    */
-
     public final Response.Listener<String> onPosted = new Response.Listener<String>() {
         @Override
         public void onResponse(String response) {
-            Log.d("onPosted", response);
-            abstractDone();
-            progressBar.setVisibility(View.INVISIBLE);
-            refresh();
+        Log.d("onPosted", response);
+        abstractDone();
+        //progressBar.setVisibility(View.INVISIBLE);
+        refresh();
         }
     };
 
     public final Response.Listener<String> onLoaded = new Response.Listener<String>() {
         @Override
         public void onResponse(String response) {
-            Log.d("onLoaded", response);
+        Log.d("onLoaded", response);
 
-            //Apigility feed = gson.fromJson(response, Apigility.class);
-            //feeds.addAll(feed.get_embedded().getFeedback());
+        hal = gson.fromJson(response, HalJson.class);
+        Log.d("feeds from api: ", String.valueOf(hal.getEmbedded().getFeed().size()));
 
-            abstractDone();
-            progressBar.setVisibility(View.INVISIBLE);
+
+        if (isInit) {
+            fetchLast();
         }
-    };
+        abstractDone();
+        progressBar.setVisibility(View.INVISIBLE);
+    }
+};
 
     public void abstractDone() {
+
+    }
+
+    public void abstractError() {
 
     }
 
@@ -188,8 +223,9 @@ public class AbstractVolleyActivity extends AppCompatActivity {
     public final Response.ErrorListener onError = new Response.ErrorListener() {
         @Override
         public void onErrorResponse(VolleyError error) {
-            Log.e("onPostsError", error.toString());
-            progressBar.setVisibility(View.INVISIBLE);
+        Log.e("onPostsError", error.toString());
+        progressBar.setVisibility(View.INVISIBLE);
+        abstractError();
         }
     };
 }

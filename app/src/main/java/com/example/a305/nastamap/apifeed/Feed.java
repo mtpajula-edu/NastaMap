@@ -118,7 +118,7 @@ public class Feed {
     public String getSnippet() {
         return "" + this.getTime() + "\n" + this.getMessage() + "\n" + this.getPayload();
     }
-
+    /*
     public static class FeedDeserilizer implements JsonDeserializer<Feed> {
 
         @Override
@@ -135,6 +135,6 @@ public class Feed {
             }
             return feed;
         }
-    }
+    }*/
 
 }

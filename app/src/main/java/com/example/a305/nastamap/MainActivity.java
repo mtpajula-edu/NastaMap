@@ -15,6 +15,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.example.a305.nastamap.apifeed.Feed;
 import com.example.a305.nastamap.apifeed.HalJson;
@@ -30,7 +32,8 @@ public class MainActivity extends AbstractVolleyActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private Integer currentFragment;
-    private HalJson hal;
+    public String clientIdAdd = "";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +51,11 @@ public class MainActivity extends AbstractVolleyActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        //SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-        //mapFragment.getMapAsync(this);
-        fetchPostsFromFile();
+        clientIdAdd += String.valueOf(System.currentTimeMillis() / 1000L);
+
+        setProgressBar(R.id.progressBar);
+
+        startFragment(R.id.nav_real);
     }
 
     @Override
@@ -91,17 +96,21 @@ public class MainActivity extends AbstractVolleyActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        /*
-        if (id == R.id.nav_map) {
 
-        } else if (id == R.id.nav_filter) {
+        boolean isPage = true;
+        if (id == R.id.nav_prev) {
+            isPage = fetchPrev();
+        } else if (id == R.id.nav_next) {
+            isPage = fetchNext();
+        } else if (id == R.id.nav_last) {
+            isPage = fetchLast();
+        } else {
+            startFragment(id);
+        }
 
-        } else if (id == R.id.nav_real) {
-
-        } else if (id == R.id.nav_history) {
-
-        }*/
-        startFragment(id);
+        if (!isPage) {
+            Toast.makeText(this,"Cant't go further", Toast.LENGTH_LONG).show();
+        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -135,7 +144,9 @@ public class MainActivity extends AbstractVolleyActivity
             ft.replace(R.id.fragment_container, hfragment);
             hfragment.setHalJson(hal);
         } else if (id == R.id.nav_real) {
-            ft.replace(R.id.fragment_container, new RealTimeFragment());
+            RealTimeFragment realfragment = new RealTimeFragment();
+            realfragment.addToClientId(clientIdAdd);
+            ft.replace(R.id.fragment_container, realfragment);
         } else {
             return;
         }
@@ -144,6 +155,19 @@ public class MainActivity extends AbstractVolleyActivity
         ft.commit();
     }
 
+    @Override
+    public void abstractDone() {
+        if (!isInit) {
+            startFragment(currentFragment);
+        }
+    }
+
+    @Override
+    public void abstractError() {
+        Toast.makeText(this,"Request error", Toast.LENGTH_LONG).show();
+    }
+
+    /*
     private void fetchPostsFromFile() {
 
         String response = readRawTextFile(getApplicationContext(), R.raw.data);
@@ -152,4 +176,5 @@ public class MainActivity extends AbstractVolleyActivity
 
         Log.d("feeds from api: ", String.valueOf(hal.getEmbedded().getFeed().size()));
     }
+    */
 }

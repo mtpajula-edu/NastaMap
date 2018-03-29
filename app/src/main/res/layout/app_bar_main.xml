@@ -25,14 +25,16 @@
         android:layout_marginTop="?attr/actionBarSize"
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent" >
 
-    <!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/map"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
+    </FrameLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context="com.example.a305.nastamap.MainActivity" />-->
+        android:layout_marginTop="?attr/actionBarSize"
+        android:padding="50dp" />
 
 </android.support.design.widget.CoordinatorLayout>

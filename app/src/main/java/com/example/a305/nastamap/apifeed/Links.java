@@ -18,6 +18,9 @@ public class Links {
     @SerializedName("next")
     @Expose
     private Next next;
+    @SerializedName("prev")
+    @Expose
+    private Prev prev;
 
     public Self getSelf() {
         return self;
@@ -49,6 +52,14 @@ public class Links {
 
     public void setNext(Next next) {
         this.next = next;
+    }
+
+    public Prev getPrev() {
+        return prev;
+    }
+
+    public void setPrev(Prev prev) {
+        this.prev = prev;
     }
 
 }

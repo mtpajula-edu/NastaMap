@@ -52,7 +52,14 @@ public class FeedListAdapter  extends BaseAdapter {
         holder.sensor.setText(listData.get(position).getSensor());
         holder.message.setText(listData.get(position).getMessage());
         holder.time.setText(listData.get(position).getTime());
-        holder.payload.setText(listData.get(position).getPayload());
+
+        String p = "";
+
+        if (listData.get(position).getLat() != null) {
+            p = "(" + listData.get(position).getLat() + " " + listData.get(position).getLon() + ")\n";
+        }
+        p += listData.get(position).getPayload();
+        holder.payload.setText(p);
 
         return convertView;
     }
