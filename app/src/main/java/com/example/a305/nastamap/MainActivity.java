@@ -18,22 +18,11 @@ import android.view.MenuItem;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.a305.nastamap.apifeed.Feed;
-import com.example.a305.nastamap.apifeed.HalJson;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
 public class MainActivity extends AbstractVolleyActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private Integer currentFragment;
+    private Integer currentFragment = null;
     public String clientIdAdd = "";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +44,23 @@ public class MainActivity extends AbstractVolleyActivity
 
         setProgressBar(R.id.progressBar);
 
-        startFragment(R.id.nav_real);
+        if (savedInstanceState != null) {
+            // Restore value of members from saved state
+            currentFragment = savedInstanceState.getInt("currentFragment");
+            ip = savedInstanceState.getString("ip");
+            fetchInit();
+        } else {
+            // Probably initialize members with default values for a new instance
+        }
+
+        startFragment(currentFragment);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt("currentFragment",currentFragment);
+        outState.putString("ip",ip);
     }
 
     @Override
@@ -134,7 +139,9 @@ public class MainActivity extends AbstractVolleyActivity
 
 
         if (id == null) {
-
+            RealTimeFragment realfragment = new RealTimeFragment();
+            realfragment.addToClientId(clientIdAdd);
+            ft.replace(R.id.fragment_container, realfragment);
         } else if (id == R.id.nav_map) {
             MapFragment mapfragment = new MapFragment();
             ft.replace(R.id.fragment_container, mapfragment);
@@ -159,6 +166,8 @@ public class MainActivity extends AbstractVolleyActivity
     public void abstractDone() {
         if (!isInit) {
             startFragment(currentFragment);
+        } else {
+            Toast.makeText(this,"Connected to nastalaatikko\n"+ip, Toast.LENGTH_LONG).show();
         }
     }
 

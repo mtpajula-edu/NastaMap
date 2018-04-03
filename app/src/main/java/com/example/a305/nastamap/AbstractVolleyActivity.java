@@ -100,27 +100,33 @@ public class AbstractVolleyActivity extends AppCompatActivity {
 
     public boolean fetchNext() {
         isInit = false;
-        if (hal.getLinks().getNext() != null) {
+        try {
             addRequest(Request.Method.GET, hal.getLinks().getNext().getHref(), null, onLoaded, false);
             return true;
+        } catch (Exception e) {
+            Log.e("Fetch",e.toString());
         }
         return false;
     }
 
     public boolean fetchPrev() {
         isInit = false;
-        if (hal.getLinks().getPrev() != null) {
+        try {
             addRequest(Request.Method.GET, hal.getLinks().getPrev().getHref(), null, onLoaded, false);
             return true;
+        } catch (Exception e) {
+            Log.e("Fetch",e.toString());
         }
         return false;
     }
 
     public boolean fetchLast() {
         isInit = false;
-        if (hal.getLinks().getLast() != null) {
+        try {
             addRequest(Request.Method.GET, hal.getLinks().getLast().getHref(), null, onLoaded, false);
             return true;
+        } catch (Exception e) {
+            Log.e("Fetch",e.toString());
         }
         return false;
     }
@@ -200,10 +206,12 @@ public class AbstractVolleyActivity extends AppCompatActivity {
         Log.d("feeds from api: ", String.valueOf(hal.getEmbedded().getFeed().size()));
 
 
+        abstractDone();
+
         if (isInit) {
             fetchLast();
         }
-        abstractDone();
+
         progressBar.setVisibility(View.INVISIBLE);
     }
 };
