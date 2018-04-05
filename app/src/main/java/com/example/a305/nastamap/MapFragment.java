@@ -25,6 +25,12 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.maps.model.TileOverlay;
 import com.google.android.gms.maps.model.TileOverlayOptions;
+import com.google.maps.android.data.geojson.GeoJsonFeature;
+import com.google.maps.android.data.geojson.GeoJsonLayer;
+import com.google.maps.android.data.geojson.GeoJsonLineStringStyle;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -34,6 +40,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     private GoogleMap map;
     private MapView mapview;
     public HalJson hal;
+    public JSONObject geoJSON;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -110,9 +117,63 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 //.width(25)
                 .color(Color.BLUE)
                 .geodesic(true));
+
+        if (geoJSON != null) {
+
+            GeoJsonLayer layer = new GeoJsonLayer(map, geoJSON);
+
+            for (GeoJsonFeature feature : layer.getFeatures()) {
+                Log.d("GEOJSON","sensorvalue_range: " + feature.getProperty("sensorvalue_range"));
+                GeoJsonLineStringStyle lineStringStyle = new GeoJsonLineStringStyle();
+
+                /*
+                Tiekuntokoodit:
+                0 = 'data not available'
+                1 = 'dry'
+                2 = 'moist'
+                3 = 'wet'
+                4 = 'slush'
+                5 = 'ice'
+                6 = 'snow'
+                 */
+
+                switch (feature.getProperty("sensorvalue_range")) {
+                    case "0":
+                        lineStringStyle.setColor(Color.TRANSPARENT);
+                        break;
+                    case "1":
+                        lineStringStyle.setColor(Color.GREEN);
+                        break;
+                    case "2":
+                        lineStringStyle.setColor(Color.YELLOW);
+                        break;
+                    case "3":
+                        lineStringStyle.setColor(Color.BLUE);
+                        break;
+                    case "4":
+                        lineStringStyle.setColor(Color.BLACK);
+                        break;
+                    case "5":
+                        lineStringStyle.setColor(Color.RED);
+                        break;
+                    case "6":
+                        lineStringStyle.setColor(Color.WHITE);
+                        break;
+                }
+
+
+                feature.setLineStringStyle(lineStringStyle);
+            }
+
+            layer.addLayerToMap();
+        }
+
     }
 
-
+    public void setGeoJSON(JSONObject geoJSON) {
+        this.geoJSON = geoJSON;
+        Log.d("FRAGMENT","setGeoJSON");
+    }
 
     public void setHalJson(HalJson hal) {
         this.hal = hal;

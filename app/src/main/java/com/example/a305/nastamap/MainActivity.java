@@ -18,6 +18,8 @@ import android.view.MenuItem;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+
 public class MainActivity extends AbstractVolleyActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -52,6 +54,9 @@ public class MainActivity extends AbstractVolleyActivity
         } else {
             // Probably initialize members with default values for a new instance
         }
+
+        String url = "http://wirma.plab.fi/cached_geojson/0/condition/";
+        addRequest(Request.Method.GET, url, null, onGeoJSONLoaded, false);
 
         startFragment(currentFragment);
     }
@@ -146,6 +151,7 @@ public class MainActivity extends AbstractVolleyActivity
             MapFragment mapfragment = new MapFragment();
             ft.replace(R.id.fragment_container, mapfragment);
             mapfragment.setHalJson(hal);
+            mapfragment.setGeoJSON(geoJSON);
         } else if (id == R.id.nav_history) {
             HistoryFragment hfragment = new HistoryFragment();
             ft.replace(R.id.fragment_container, hfragment);

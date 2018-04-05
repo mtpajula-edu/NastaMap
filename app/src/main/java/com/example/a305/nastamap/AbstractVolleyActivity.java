@@ -20,6 +20,8 @@ import com.example.a305.nastamap.apifeed.HalJson;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -45,6 +47,7 @@ public class AbstractVolleyActivity extends AppCompatActivity {
     public String ip = "";
     public HalJson hal;
     public boolean isInit = false;
+    public JSONObject geoJSON;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -200,21 +203,39 @@ public class AbstractVolleyActivity extends AppCompatActivity {
     public final Response.Listener<String> onLoaded = new Response.Listener<String>() {
         @Override
         public void onResponse(String response) {
-        Log.d("onLoaded", response);
+            Log.d("onLoaded", response);
 
-        hal = gson.fromJson(response, HalJson.class);
-        Log.d("feeds from api: ", String.valueOf(hal.getEmbedded().getFeed().size()));
+            hal = gson.fromJson(response, HalJson.class);
+            Log.d("feeds from api: ", String.valueOf(hal.getEmbedded().getFeed().size()));
 
 
-        abstractDone();
+            abstractDone();
 
-        if (isInit) {
-            fetchLast();
+            if (isInit) {
+                fetchLast();
+            }
+
+            progressBar.setVisibility(View.INVISIBLE);
         }
+    };
 
-        progressBar.setVisibility(View.INVISIBLE);
-    }
-};
+    public final Response.Listener<String> onGeoJSONLoaded = new Response.Listener<String>() {
+        @Override
+        public void onResponse(String response) {
+            Log.d("onLoaded", response);
+
+
+            try {
+                geoJSON = new JSONObject(response);
+            } catch (Exception e) {
+                Log.e("GEOJSON","Failed to parse json from request");
+            }
+
+            abstractDone();
+
+            progressBar.setVisibility(View.INVISIBLE);
+        }
+    };
 
     public void abstractDone() {
 
