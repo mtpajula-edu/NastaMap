@@ -35,14 +35,12 @@ public class RealTimeFragment extends Fragment {
 
     public MqttAndroidClient mqttAndroidClient;
     public String serverUri;
-    public String clientId = "a:ylowmv:";
+    public String clientId = "";
     public String subscriptionTopic;
     public String mqttUsername;
     public String mqttPassword;
     public ListView mListView;
     public Gson gson;
-    //public ArrayList<String> posts = new ArrayList<String>();
-    //public ArrayAdapter<String> adapter;
     public FeedListAdapter adapter;
 
     @Override
@@ -50,7 +48,6 @@ public class RealTimeFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         serverUri         = getResources().getString(R.string.mqtt_server_url);
-        //clientId          = getResources().getString(R.string.mqtt_client_id);
         subscriptionTopic = getResources().getString(R.string.mqtt_topic);
         mqttUsername      = getResources().getString(R.string.mqtt_username);
         mqttPassword      = getResources().getString(R.string.mqtt_password);
@@ -67,16 +64,12 @@ public class RealTimeFragment extends Fragment {
         //clientId += String.valueOf(System.currentTimeMillis() / 1000L);
         Log.d("MQTT clientId",clientId);
 
-        getActivity().setTitle("Real time feed");
+        getActivity().setTitle(getResources().getString(R.string.feed_fragment_title));
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gson = gsonBuilder.create();
-        //gson = new GsonBuilder()
-        //        .registerTypeAdapter(Feed.class, new Feed.FeedDeserilizer())
-        //        .create();
 
         // ListView
-        //adapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1, posts);
         mListView = (ListView) rootView.findViewById(R.id.real_list);
         //mListView.setAdapter(adapter);
 
@@ -94,17 +87,16 @@ public class RealTimeFragment extends Fragment {
             public void connectComplete(boolean reconnect, String serverURI) {
 
                 if (reconnect) {
-                    addToHistory("Reconnected to : " + serverURI);
                     // Because Clean Session is true, we need to re-subscribe
                     subscribeToTopic();
-                } else {
-                    addToHistory("Connected to: " + serverURI);
                 }
+
+                addToHistory(R.string.mqtt_connected);
             }
 
             @Override
             public void connectionLost(Throwable cause) {
-                addToHistory("The Connection was lost.");
+                addToHistory(R.string.mqtt_connection_failed);
             }
 
             @Override
@@ -129,7 +121,7 @@ public class RealTimeFragment extends Fragment {
         mqttConnectOptions.setPassword(mqttPassword.toCharArray());
 
         try {
-            addToHistory("Connecting to " + serverUri);
+            addToHistory(R.string.mqtt_connecting);
             Log.d("MQTT","password: " + mqttPassword);
 
             mqttAndroidClient.connect(mqttConnectOptions, null, new IMqttActionListener() {
@@ -146,7 +138,7 @@ public class RealTimeFragment extends Fragment {
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    addToHistory("Failed to connect to: " + serverUri);
+                    addToHistory(R.string.mqtt_connection_failed);
                     addToHistory(exception.getMessage());
                 }
             });
@@ -175,6 +167,12 @@ public class RealTimeFragment extends Fragment {
 
     public void addToClientId(String add) {
         clientId = "a:ylowmv:" + add;
+    }
+
+    private void addToHistory(Integer stringId) {
+        if (getContext() != null) {
+            addToHistory(getContext().getResources().getString(stringId));
+        }
     }
 
     private void addToHistory(String mainText){
@@ -213,17 +211,17 @@ public class RealTimeFragment extends Fragment {
             mqttAndroidClient.subscribe(subscriptionTopic, 0, null, new IMqttActionListener() {
                 @Override
                 public void onSuccess(IMqttToken asyncActionToken) {
-                    addToHistory("Subscribed!");
+                    addToHistory(R.string.mqtt_subscribed);
                 }
 
                 @Override
                 public void onFailure(IMqttToken asyncActionToken, Throwable exception) {
-                    addToHistory("Failed to subscribe");
+                    addToHistory(R.string.mqtt_subscribe_failed);
                 }
             });
         } catch (MqttException ex){
             System.err.println("Exception whilst subscribing");
-            ex.printStackTrace();
+            addToHistory(R.string.mqtt_subscribe_failed);
         }
     }
 
@@ -235,7 +233,6 @@ public class RealTimeFragment extends Fragment {
 
 
         FragmentTransaction ft = ((MainActivity)getActivity()).getSupportFragmentManager().beginTransaction();
-        //FragmentTransaction ft = fragmentManager.beginTransaction();
         ft.replace(R.id.fragment_container,wf);
         ft.addToBackStack(null);
         ft.commit();

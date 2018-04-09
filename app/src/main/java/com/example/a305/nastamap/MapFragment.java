@@ -46,7 +46,7 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_maps, container, false);
 
-        getActivity().setTitle("Map");
+        getActivity().setTitle(getResources().getString(R.string.map_fragment_title));
 
         mapview = (MapView) rootView.findViewById(R.id.mapView);
         mapview.onCreate(savedInstanceState);
@@ -160,7 +160,6 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         lineStringStyle.setColor(Color.WHITE);
                         break;
                 }
-
 
                 feature.setLineStringStyle(lineStringStyle);
             }

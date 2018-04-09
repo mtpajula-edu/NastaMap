@@ -59,10 +59,6 @@ public class AbstractVolleyActivity extends AppCompatActivity {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gson = gsonBuilder.create();
 
-        //gson = new GsonBuilder()
-        //        .registerTypeAdapter(Feed.class, new Feed.FeedDeserilizer())
-        //        .create();
-
         headers = new HashMap<String, String>();
         headers.put("Accept", "application/json");
         headers.put("Content-Type", "application/json; charset=utf-8");

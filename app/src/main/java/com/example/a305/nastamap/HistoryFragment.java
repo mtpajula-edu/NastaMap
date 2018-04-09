@@ -38,7 +38,7 @@ public class HistoryFragment extends Fragment {
 
         Log.d("FRAGMENT","onCreateView HistoryFragment");
 
-        getActivity().setTitle("History");
+        getActivity().setTitle(getResources().getString(R.string.history_fragment_title));
 
         mListView = (ListView) rootView.findViewById(R.id.real_list);
         ArrayList<Feed> f = new ArrayList<Feed>();

@@ -23,7 +23,7 @@ public class WebFragment extends Fragment {
 
         WebView mWebView = (WebView) rootView.findViewById(R.id.webview);
 
-        getActivity().setTitle("Image");
+        getActivity().setTitle(getResources().getString(R.string.web_fragment_title));
 
         if(url != null){
             mWebView.loadUrl(url);

@@ -55,7 +55,7 @@ public class MainActivity extends AbstractVolleyActivity
             // Probably initialize members with default values for a new instance
         }
 
-        String url = "http://wirma.plab.fi/cached_geojson/0/condition/";
+        String url = getResources().getString(R.string.wirma_condition_url);
         addRequest(Request.Method.GET, url, null, onGeoJSONLoaded, false);
 
         startFragment(currentFragment);
@@ -119,7 +119,7 @@ public class MainActivity extends AbstractVolleyActivity
         }
 
         if (!isPage) {
-            Toast.makeText(this,"Cant't go further", Toast.LENGTH_LONG).show();
+            Toast.makeText(this,getResources().getString(R.string.toast_no_further), Toast.LENGTH_LONG).show();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -173,23 +173,15 @@ public class MainActivity extends AbstractVolleyActivity
         if (!isInit) {
             startFragment(currentFragment);
         } else {
-            Toast.makeText(this,"Connected to nastalaatikko\n"+ip, Toast.LENGTH_LONG).show();
+            Toast.makeText(this,getResources().getString(
+                        R.string.toast_connected_to_ip
+                    ) + "\n" + ip,
+                    Toast.LENGTH_LONG).show();
         }
     }
 
     @Override
     public void abstractError() {
-        Toast.makeText(this,"Request error", Toast.LENGTH_LONG).show();
+        Toast.makeText(this,getResources().getString(R.string.toast_request_error), Toast.LENGTH_LONG).show();
     }
-
-    /*
-    private void fetchPostsFromFile() {
-
-        String response = readRawTextFile(getApplicationContext(), R.raw.data);
-        Log.d("Response", response);
-        hal = gson.fromJson(response, HalJson.class);
-
-        Log.d("feeds from api: ", String.valueOf(hal.getEmbedded().getFeed().size()));
-    }
-    */
 }

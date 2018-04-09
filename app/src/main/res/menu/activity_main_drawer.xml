@@ -7,36 +7,36 @@
         <item
             android:id="@+id/nav_map"
             android:icon="@drawable/ic_map_black"
-            android:title="Map" />
+            android:title="@string/map_fragment_title" />
     </group>
 
-    <item android:title="Feed">
+    <item android:title="@string/feed">
         <menu>
             <item
                 android:id="@+id/nav_real"
                 android:icon="@drawable/ic_rss_feed_black"
-                android:title="Real time" />
+                android:title="@string/feed_fragment_title" />
             <item
                 android:id="@+id/nav_history"
                 android:icon="@drawable/ic_list_black"
-                android:title="Current list" />
+                android:title="@string/history_fragment_title" />
         </menu>
     </item>
 
-    <item android:title="Data page">
+    <item android:title="@string/history_page">
     <menu>
         <item
             android:id="@+id/nav_prev"
             android:icon="@drawable/ic_keyboard_arrow_left_black"
-            android:title="Previous" />
+            android:title="@string/prev" />
         <item
             android:id="@+id/nav_next"
             android:icon="@drawable/ic_keyboard_arrow_right_black"
-            android:title="Next" />
+            android:title="@string/next" />
         <item
             android:id="@+id/nav_last"
             android:icon="@drawable/ic_last_page_black"
-            android:title="Last" />
+            android:title="@string/last" />
     </menu>
 </item>
 

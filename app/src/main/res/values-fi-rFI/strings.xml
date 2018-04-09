@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Nasta Map</string>
+    <string name="title_activity_maps">Kartta</string>
+    <string name="navigation_drawer_open">Avaa valikko</string>
+    <string name="navigation_drawer_close">Sulje valikko</string>
+    <string name="nav_header_title">Nasta Map</string>
+    <string name="title_activity_main">Nasta Map</string>
+    <string name="nav_header_subtitle">Nastalaatikon ja Wirman data</string>
+    <string name="nav_header_desc">Valikon otsikko</string>
+    <string name="action_settings">Asetukset</string>
+    <string name="feed_fragment_title">Reaaliaikainen</string>
+    <string name="mqtt_subscribed">Tietovirta tilattu</string>
+    <string name="mqtt_subscribe_failed">Tietovirran tilaus epäonnistui</string>
+    <string name="mqtt_connecting">Yhdistetään palvelimeen</string>
+    <string name="mqtt_connected">Yhdistetty</string>
+    <string name="mqtt_connection_failed">Yhdistäminen epäonnistui</string>
+    <string name="web_fragment_title">Kuva</string>
+    <string name="map_fragment_title">Kartta</string>
+    <string name="history_fragment_title">Historia</string>
+    <string name="toast_no_further">Sivua ei löydy</string>
+    <string name="toast_request_error">Tiedonhaku epäonnistui</string>
+    <string name="toast_connected_to_ip">Yhdistetty nastalaatikkoon</string>
+    <string name="feed">Tietovirta</string>
+    <string name="history_page">Historiasivut</string>
+    <string name="prev">Edellinen</string>
+    <string name="next">Seuraava</string>
+    <string name="last">Viimeinen</string>
+</resources>
