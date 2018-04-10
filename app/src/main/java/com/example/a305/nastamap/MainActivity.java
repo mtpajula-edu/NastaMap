@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.Request;
+import com.android.volley.Response;
 
 public class MainActivity extends AbstractVolleyActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -55,11 +56,30 @@ public class MainActivity extends AbstractVolleyActivity
             // Probably initialize members with default values for a new instance
         }
 
-        String url = getResources().getString(R.string.wirma_condition_url);
-        addRequest(Request.Method.GET, url, null, onGeoJSONLoaded, false);
+        geoJsons.clear();
+        addGeoJsonRequest(
+                onWirmaConditionLoaded,
+                getResources().getString(R.string.wirma_condition_url));
+        addGeoJsonRequest(
+                onWirmaFrictionLoaded,
+                getResources().getString(R.string.wirma_friction_url));
 
         startFragment(currentFragment);
     }
+
+    public final Response.Listener<String> onWirmaConditionLoaded = new Response.Listener<String>() {
+        @Override
+        public void onResponse(String response) {
+            onGeoJsonResponse(getResources().getString(R.string.wirma_condition), response);
+        }
+    };
+
+    public final Response.Listener<String> onWirmaFrictionLoaded = new Response.Listener<String>() {
+        @Override
+        public void onResponse(String response) {
+            onGeoJsonResponse(getResources().getString(R.string.wirma_friction), response);
+        }
+    };
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
@@ -78,6 +98,7 @@ public class MainActivity extends AbstractVolleyActivity
         }
     }
 
+    /*
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -98,7 +119,7 @@ public class MainActivity extends AbstractVolleyActivity
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -151,7 +172,7 @@ public class MainActivity extends AbstractVolleyActivity
             MapFragment mapfragment = new MapFragment();
             ft.replace(R.id.fragment_container, mapfragment);
             mapfragment.setHalJson(hal);
-            mapfragment.setGeoJSON(geoJSON);
+            mapfragment.setGeoJsons(geoJsons);
         } else if (id == R.id.nav_history) {
             HistoryFragment hfragment = new HistoryFragment();
             ft.replace(R.id.fragment_container, hfragment);

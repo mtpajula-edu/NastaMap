@@ -47,7 +47,7 @@ public class AbstractVolleyActivity extends AppCompatActivity {
     public String ip = "";
     public HalJson hal;
     public boolean isInit = false;
-    public JSONObject geoJSON;
+    public Map<String, JSONObject> geoJsons = new HashMap<String, JSONObject>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,6 +142,10 @@ public class AbstractVolleyActivity extends AppCompatActivity {
         return ip;
     }
 
+    public void addGeoJsonRequest(Response.Listener<String> go, String url) {
+        addRequest(Request.Method.GET, url, null, go, false);
+    }
+
     public void addRequest(int method, String url, String id, Response.Listener<String> go, boolean body) {
 
         progressBar.setVisibility(View.VISIBLE);
@@ -215,23 +219,23 @@ public class AbstractVolleyActivity extends AppCompatActivity {
         }
     };
 
-    public final Response.Listener<String> onGeoJSONLoaded = new Response.Listener<String>() {
-        @Override
-        public void onResponse(String response) {
-            Log.d("onLoaded", response);
+    public void onGeoJsonResponse(String name, String response) {
+        Log.d("onLoaded", response);
 
 
-            try {
-                geoJSON = new JSONObject(response);
-            } catch (Exception e) {
-                Log.e("GEOJSON","Failed to parse json from request");
-            }
-
+        try {
+            geoJsons.put(name, new JSONObject(response));
+            Log.d("ADDGEOJSON",name);
             abstractDone();
+        } catch (Exception e) {
 
-            progressBar.setVisibility(View.INVISIBLE);
+            Log.e("GEOJSON","Failed to parse json from request");
+            abstractError();
         }
-    };
+
+
+        progressBar.setVisibility(View.INVISIBLE);
+    }
 
     public void abstractDone() {
 

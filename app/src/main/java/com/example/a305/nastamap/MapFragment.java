@@ -7,6 +7,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import com.example.a305.nastamap.apifeed.Feed;
 import com.example.a305.nastamap.apifeed.HalJson;
@@ -33,23 +36,55 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-public class MapFragment extends Fragment implements OnMapReadyCallback {
+public class MapFragment extends Fragment implements OnMapReadyCallback, View.OnClickListener {
 
     private UiSettings mUiSettings;
     private GoogleMap map;
     private MapView mapview;
     public HalJson hal;
-    public JSONObject geoJSON;
+    public View rootView;
+    public Map<String, JSONObject> geoJsons = new HashMap<String, JSONObject>();
+    public Map<String, GeoJsonLayer> geoJsonLayers = new HashMap<String, GeoJsonLayer>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_maps, container, false);
+        rootView = inflater.inflate(R.layout.fragment_maps, container, false);
 
         getActivity().setTitle(getResources().getString(R.string.map_fragment_title));
 
         mapview = (MapView) rootView.findViewById(R.id.mapView);
         mapview.onCreate(savedInstanceState);
+
+        //Button b = (Button) rootView.findViewById(R.id.map_button);
+        //b.setOnClickListener(this);
+
+        RadioGroup radioGroup = (RadioGroup) rootView.findViewById(R.id.radioGroup);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                // checkedId is the RadioButton selected
+                //RadioButton rb = (RadioButton) rootView.findViewById(checkedId);
+                //Log.d("FRAGMENT",String.valueOf(rb.getText()));
+                setCheckedLayerOnMap();
+
+                /*
+                for (Map.Entry<String, GeoJsonLayer> entry : geoJsonLayers.entrySet()) {
+
+                    Log.d("FRAGMENT",String.valueOf(rb.getText()));
+                    Log.d("FRAGMENT",entry.getKey());
+
+                    if (entry.getKey().equals(String.valueOf(rb.getText()))) {
+                        entry.getValue().addLayerToMap();
+                    } else {
+                        entry.getValue().removeLayerFromMap();
+                    }
+                }*/
+            }
+        });
 
         mapview.onResume(); // needed to get the map to display immediately
 
@@ -62,6 +97,24 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
         mapview.getMapAsync(this);
 
         return rootView;
+    }
+
+    public void setCheckedLayerOnMap() {
+        RadioGroup radioGroup = (RadioGroup) rootView.findViewById(R.id.radioGroup);
+        Integer radioButtonID = radioGroup.getCheckedRadioButtonId();
+        RadioButton rb = (RadioButton) radioGroup.findViewById(radioButtonID);
+
+        for (Map.Entry<String, GeoJsonLayer> entry : geoJsonLayers.entrySet()) {
+
+            Log.d("FRAGMENT",String.valueOf(rb.getText()));
+            Log.d("FRAGMENT",entry.getKey());
+
+            if (entry.getKey().equals(String.valueOf(rb.getText()))) {
+                entry.getValue().addLayerToMap();
+            } else {
+                entry.getValue().removeLayerFromMap();
+            }
+        }
     }
 
     public void onMapReady(GoogleMap mMap) {
@@ -118,14 +171,26 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 .color(Color.BLUE)
                 .geodesic(true));
 
-        if (geoJSON != null) {
+        geoJsonLayers.clear();
+        for (Map.Entry<String, JSONObject> entry : geoJsons.entrySet()) {
+            addGeoJsonToMap(entry.getKey(), entry.getValue());
+        }
 
-            GeoJsonLayer layer = new GeoJsonLayer(map, geoJSON);
+        setCheckedLayerOnMap();
+    }
 
+    public void addGeoJsonToMap(String name, JSONObject geoJSON) {
+        GeoJsonLayer layer = new GeoJsonLayer(map, geoJSON);
+
+        for (Map.Entry<String, GeoJsonLayer> entry : geoJsonLayers.entrySet()) {
+            entry.getValue().removeLayerFromMap();
+        }
+
+        if (name.equals("condition")) {
             for (GeoJsonFeature feature : layer.getFeatures()) {
-                Log.d("GEOJSON","sensorvalue_range: " + feature.getProperty("sensorvalue_range"));
-                GeoJsonLineStringStyle lineStringStyle = new GeoJsonLineStringStyle();
+            //Log.d("GEOJSON","sensorvalue_range: " + feature.getProperty("sensorvalue_range"));
 
+                GeoJsonLineStringStyle lineStringStyle = new GeoJsonLineStringStyle();
                 /*
                 Tiekuntokoodit:
                 0 = 'data not available'
@@ -145,13 +210,13 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                         lineStringStyle.setColor(Color.GREEN);
                         break;
                     case "2":
-                        lineStringStyle.setColor(Color.YELLOW);
+                        lineStringStyle.setColor(Color.parseColor("#cccc00"));
                         break;
                     case "3":
-                        lineStringStyle.setColor(Color.BLUE);
+                        lineStringStyle.setColor(Color.YELLOW);
                         break;
                     case "4":
-                        lineStringStyle.setColor(Color.BLACK);
+                        lineStringStyle.setColor(Color.parseColor("#ff9900"));
                         break;
                     case "5":
                         lineStringStyle.setColor(Color.RED);
@@ -164,18 +229,56 @@ public class MapFragment extends Fragment implements OnMapReadyCallback {
                 feature.setLineStringStyle(lineStringStyle);
             }
 
-            layer.addLayerToMap();
-        }
+            //layer.addLayerToMap();
 
+        } else if (name.equals("friction")) {
+            for (GeoJsonFeature feature : layer.getFeatures()) {
+                GeoJsonLineStringStyle lineStringStyle = new GeoJsonLineStringStyle();
+                /*
+                kitkakoodit:
+                1 = 'worst'
+                2 = ''
+                3 = ''
+                4 = 'best'
+                 */
+
+                switch (feature.getProperty("sensorvalue_range")) {
+                    case "0":
+                        lineStringStyle.setColor(Color.TRANSPARENT);
+                        break;
+                    case "1":
+                        lineStringStyle.setColor(Color.RED);
+                        break;
+                    case "2":
+                        lineStringStyle.setColor(Color.parseColor("#ff9900"));
+                        break;
+                    case "3":
+                        lineStringStyle.setColor(Color.parseColor("#cccc00"));
+                        break;
+                    case "4":
+                        lineStringStyle.setColor(Color.GREEN);
+                        break;
+                }
+
+                feature.setLineStringStyle(lineStringStyle);
+            }
     }
 
-    public void setGeoJSON(JSONObject geoJSON) {
-        this.geoJSON = geoJSON;
-        Log.d("FRAGMENT","setGeoJSON");
+        Log.d("GEOJSON","put: " + name);
+        geoJsonLayers.put(name, layer);
+    }
+
+    public void setGeoJsons(Map<String, JSONObject> geoJsons) {
+        this.geoJsons = geoJsons;
+        Log.d("FRAGMENT","setGeoJsons");
     }
 
     public void setHalJson(HalJson hal) {
         this.hal = hal;
         Log.d("FRAGMENT","setHalJson");
+    }
+
+    public void onClick(View view) {
+        Log.d("FRAGMENT","onMapButtonClick");
     }
 }

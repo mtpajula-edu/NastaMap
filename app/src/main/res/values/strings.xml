@@ -25,6 +25,10 @@
     <string name="history_fragment_title">History</string>
 
     <string translatable="false" name="wirma_condition_url">http://wirma.plab.fi/cached_geojson/0/condition/</string>
+    <string translatable="false" name="wirma_friction_url">http://wirma.plab.fi/cached_geojson/0/friction/</string>
+
+    <string translatable="false" name="wirma_condition">condition</string>
+    <string translatable="false" name="wirma_friction">friction</string>
 
     <string name="toast_no_further">Cant\'t go further</string>
     <string name="toast_request_error">Request error</string>
